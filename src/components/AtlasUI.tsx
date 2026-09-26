@@ -28,7 +28,7 @@ export function TrackingViewport({ tracking, preview = false, grid = true }: { t
   const x = tracking?.target?.x;
   const y = tracking?.target?.y;
   const valid = typeof x === "number" && typeof y === "number" && Number.isFinite(x) && Number.isFinite(y) && tracking?.status?.detected;
-  return <div className={`tracking-viewport ${grid ? "viewport-grid" : ""} ${preview ? "viewport-preview" : ""}`} role="img" aria-label={valid ? `Tracking viewport, target at X ${formatNumber(x)} Y ${formatNumber(y)}` : "Tracking viewport, no detected target"}>
+  return <div className={`tracking-viewport ${grid ? "viewport-grid" : ""} ${preview ? "viewport-preview" : ""} ${tracking ? "" : "viewport-unavailable"}`} role="img" aria-label={valid ? `Tracking viewport, target at X ${formatNumber(x)} Y ${formatNumber(y)}` : "Tracking viewport, no detected target"}>
     <div className="viewport-top"><span><span className="tiny-square" /> CAMERA FRAME / 640 × 480</span><span>{preview ? "ILLUSTRATIVE VIEW" : tracking ? "TRACKING DATA" : "NO FRAME AVAILABLE"} <span className="live-indicator" /></span></div>
     <span className="viewport-axis axis-top">X 320</span><span className="viewport-axis axis-left">Y 240</span>
     <span className="viewport-center"><i /><i /></span>
