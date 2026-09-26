@@ -1,24 +1,33 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowRight, Camera, Crosshair, MapPin, Radio, ScanSearch, ShieldCheck, TrendingUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { DashboardPreview, Footer, Header } from "@/components/AtlasUI";
+import landscape from "@/assets/atlas-landscape.jpg";
+import optics from "@/assets/atlas-optics.jpg";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({ meta: [
+    { title: "ATLAS — Autonomous Target Localization and Acquisition System" },
+    { name: "description", content: "ATLAS combines computer vision, state estimation, and camera control for autonomous target tracking. Explore the system and open the live monitoring dashboard." },
+    { property: "og:title", content: "ATLAS — Autonomous Target Localization and Acquisition System" },
+    { property: "og:description", content: "Explore the ATLAS autonomous target tracking system and its live monitoring dashboard." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary_large_image" },
+  ] }),
+  component: Home,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
+const steps = [
+  { number: "01", title: "Target Detection", description: "CNN-based ML detector identifies the target in real time.", icon: ScanSearch },
+  { number: "02", title: "Localization", description: "Precise target position estimation in the frame.", icon: MapPin },
+  { number: "03", title: "Motion Estimation", description: "Kalman filter estimates position and velocity.", icon: TrendingUp },
+  { number: "04", title: "Camera Control", description: "Velocity-aware controller generates pan/tilt commands.", icon: Camera },
+  { number: "05", title: "System Health", description: "Live monitoring and telemetry for reliable operation.", icon: ShieldCheck },
+];
+
+function Home() {
+  return <div className="atlas-site"><Header active="home" /><main>
+    <section className="home-hero" aria-labelledby="hero-title"><img className="hero-landscape" src={landscape} width={1920} height={1088} alt="Dark mountain ridges beneath Earth from space" /><div className="hero-overlay" /><div className="hero-inner"><div className="hero-copy"><p className="eyebrow">AUTONOMOUS <span>/</span> PRECISE <span>/</span> RELIABLE</p><h1 id="hero-title" className="hero-wordmark"><Crosshair aria-hidden="true" strokeWidth={1.2} />ATLAS</h1><h2>Autonomous Target Localization<br />and Acquisition System</h2><p>ATLAS is a computer-vision-based autonomous target tracking system. It combines a trained CNN-based ML detector, a Kalman filter, and a velocity-aware camera controller.</p><p>This website is the frontend visualization and monitoring interface for the tracking pipeline.</p><Button asChild variant="hero" size="lg"><Link to="/dashboard">Open Dashboard <ArrowRight size={16} /></Link></Button></div><div className="hero-preview-wrap"><DashboardPreview /></div></div></section>
+    <section className="system-section" id="system" aria-labelledby="system-title"><div className="system-image" style={{ backgroundImage: `url(${optics})` }} /><div className="system-inner"><div className="system-intro"><p className="eyebrow">THE SYSTEM</p><h2 id="system-title">From Detection to<br /><em>Acquisition</em></h2><p>ATLAS combines computer vision, state estimation, and control to deliver real-time autonomous target tracking and camera control.</p><span className="intro-rule" /><a href="#pipeline" className="text-link">Explore the Pipeline <ArrowRight size={15} /></a></div><div className="radar-art" aria-label="Illustrative target localization visualization"><div className="radar-ring radar-ring-outer" /><div className="radar-ring radar-ring-mid" /><div className="radar-ring radar-ring-inner" /><div className="radar-cross radar-cross-horizontal" /><div className="radar-cross radar-cross-vertical" /><div className="radar-orbit" /><div className="radar-core"><img src={optics} width={1536} height={1024} loading="lazy" alt="Optical tracking camera in a mountain environment" /><Crosshair size={38} strokeWidth={1} /></div><span className="radar-node node-one" /><span className="radar-node node-two" /><span className="radar-node node-three" /></div><div className="pipeline" id="pipeline">{steps.map(({ number, title, description, icon: Icon }) => <div className="pipeline-step" key={number}><div className="step-icon"><Icon size={20} strokeWidth={1.4} /></div><span className="step-number">{number}</span><div><h3>{title}</h3><p>{description}</p></div></div>)}</div></div></section>
+  </main><Footer /></div>;
 }
