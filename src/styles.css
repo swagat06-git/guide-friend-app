@@ -49,10 +49,12 @@
 .utility-link { width: 30px; height: 30px; display: grid; place-items: center; border: 1px solid var(--border); color: var(--primary); text-decoration: none; }
 .utility-link:hover { background: var(--accent); }
 .home-hero { min-height: 670px; position: relative; isolation: isolate; display: flex; align-items: center; }
+.home-hero::after, .system-section::after { content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: 0; background-image: linear-gradient(var(--line-faint) 1px, transparent 1px), linear-gradient(90deg, var(--line-faint) 1px, transparent 1px), radial-gradient(circle 145px at var(--cursor-x, 50%) var(--cursor-y, 50%), var(--primary-glow), transparent); background-size: 46px 46px, 46px 46px, 100% 100%; mask-image: radial-gradient(circle 260px at var(--cursor-x, 50%) var(--cursor-y, 50%), black 0%, transparent 100%); transition: opacity .35s ease; }
+.home-hero.background-active::after, .system-section.background-active::after { opacity: 1; }
 .hero-landscape, .hero-overlay { position: absolute; inset: 0; width: 100%; height: 100%; }
-.hero-landscape { object-fit: cover; object-position: center 50%; z-index: -2; }
+.hero-landscape { object-fit: cover; object-position: center 50%; z-index: -2; transform: scale(1.05) translate3d(var(--image-shift-x, 0px), var(--image-shift-y, 0px), 0); transition: transform .55s ease-out; }
 .hero-overlay { z-index: -1; background: linear-gradient(90deg, oklch(0.105 0.025 245 / 89%) 0%, oklch(0.105 0.025 245 / 66%) 36%, oklch(0.105 0.025 245 / 32%) 100%), linear-gradient(0deg, var(--background) 0%, transparent 23%, transparent 70%, oklch(0.105 0.025 245 / 24%) 100%); }
-.hero-inner { width: 100%; max-width: 1500px; margin: 0 auto; padding: 68px 5% 76px; display: grid; grid-template-columns: minmax(360px, .9fr) minmax(500px, 1.1fr); align-items: center; gap: 4%; }
+.hero-inner { position: relative; z-index: 1; width: 100%; max-width: 1500px; margin: 0 auto; padding: 68px 5% 76px; display: grid; grid-template-columns: minmax(360px, .9fr) minmax(500px, 1.1fr); align-items: center; gap: 4%; }
 .hero-copy { max-width: 575px; }
 .eyebrow { color: var(--primary); font: 600 11px var(--font-mono); letter-spacing: .29em; text-transform: uppercase; }
 .eyebrow span { color: var(--muted-foreground); padding: 0 7px; }
@@ -98,9 +100,9 @@
 .preview-bottom > span { flex: 1; padding: 6px; border: 1px solid var(--border); color: var(--muted-foreground); font-size: 7px; }
 .preview-bottom b { color: var(--primary); display: block; font-size: 11px; margin-top: 3px; }
 .system-section { position: relative; min-height: 545px; border-top: 1px solid var(--border); isolation: isolate; overflow: hidden; background: var(--background); }
-.system-image { position: absolute; inset: 0 0 0 auto; width: 47%; background-size: cover; background-position: 58% center; z-index: -2; opacity: .65; }
+.system-image { position: absolute; inset: 0 0 0 auto; width: 47%; background-size: cover; background-position: 58% center; z-index: -2; opacity: .65; transform: scale(1.06) translate3d(var(--image-shift-x, 0px), var(--image-shift-y, 0px), 0); transition: transform .55s ease-out; }
 .system-section:before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, var(--background) 0%, var(--background) 47%, oklch(0.13 0.023 245 / 72%) 73%, oklch(0.13 0.023 245 / 24%) 100%), linear-gradient(0deg, var(--background), transparent 20%, transparent 80%, var(--background)); }
-.system-inner { max-width: 1500px; margin: auto; min-height: 545px; padding: 65px 5%; display: grid; grid-template-columns: minmax(220px, 1fr) minmax(250px, .95fr) minmax(280px, 1.12fr); align-items: center; gap: 3%; }
+.system-inner { position: relative; z-index: 1; max-width: 1500px; margin: auto; min-height: 545px; padding: 65px 5%; display: grid; grid-template-columns: minmax(220px, 1fr) minmax(250px, .95fr) minmax(280px, 1.12fr); align-items: center; gap: 3%; }
 .system-intro h2 { font-size: clamp(29px, 3vw, 47px); line-height: 1.15; font-weight: 500; margin: 16px 0 20px; }
 .system-intro h2 em { color: var(--primary); font-style: normal; }
 .system-intro > p:not(.eyebrow) { font-size: 13px; line-height: 1.8; max-width: 350px; color: var(--muted-foreground); }
