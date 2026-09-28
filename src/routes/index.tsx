@@ -179,7 +179,7 @@ function Home() {
         </div>
 
         <div className="immersive-hero-copy">
-          <p className="immersive-kicker">AUTONOMOUS OPTICAL ACQUISITION</p>
+          <p className="immersive-kicker">AUTONOMOUS TARGET LOCALIZATION AND ACQUISITION SYSTEM</p>
           <h1 id="hero-title">ATLAS</h1>
           <p className="immersive-lead">A machine that finds the signal.</p>
           <p className="immersive-body">Computer vision, state estimation and camera control working as one continuous acquisition loop.</p>
