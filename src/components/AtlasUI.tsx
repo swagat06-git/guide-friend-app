@@ -16,8 +16,8 @@ export function SystemStatus() {
   return <span className={`status-pill status-${connection === "connected" && trackingError ? "offline" : connection}`} role="status"><span className="status-dot" />{label}</span>;
 }
 
-export function Header({ active }: { active: "home" | "dashboard" }) {
-  return <header className="site-header"><div className="header-inner"><Brand /><nav aria-label="Main navigation"><Link to="/" className={active === "home" ? "nav-active" : ""}>Home</Link><Link to="/dashboard" className={active === "dashboard" ? "nav-active" : ""}>Dashboard</Link></nav><div className="header-right"><SystemStatus /><Link to="/dashboard" className="utility-link" title="Open dashboard" aria-label="Open dashboard"><ArrowUpRight size={16} /></Link></div></div></header>;
+export function Header({ active }: { active: "home" | "dashboard" | "benchmark" }) {
+  return <header className="site-header"><div className="header-inner"><Brand /><nav aria-label="Main navigation"><Link to="/" className={active === "home" ? "nav-active" : ""}>Home</Link><Link to="/dashboard" className={active === "dashboard" ? "nav-active" : ""}>Dashboard</Link><Link to="/benchmark" className={active === "benchmark" ? "nav-active" : ""}>Performance</Link></nav><div className="header-right"><SystemStatus /><Link to="/dashboard" className="utility-link" title="Open dashboard" aria-label="Open dashboard"><ArrowUpRight size={16} /></Link></div></div></header>;
 }
 
 export function Footer() {
