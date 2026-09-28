@@ -135,3 +135,42 @@
 @media (max-width: 520px) { .hero-inner { padding-top: 64px; gap: 44px; }.eyebrow { font-size: 9px; letter-spacing: .18em; }.eyebrow span { padding: 0 3px; }.hero-wordmark { font-size: 58px; gap: 10px; }.hero-wordmark svg { width: 40px; height: 40px; }.hero-copy h2 { font-size: 22px; }.hero-copy p:not(.eyebrow) { font-size: 13px; }.dashboard-preview { height: 260px; }.preview-body { grid-template-columns: 58px minmax(0, 1fr) 77px; }.preview-sidebar { padding: 8px 2px; gap: 2px; }.preview-sidebar span { font-size: 0; gap: 0; justify-content: center; }.preview-sidebar svg { width: 13px; height: 13px; }.preview-main { padding: 6px; }.preview-stats { padding: 5px 3px 5px 0; gap: 3px; }.preview-stats > span { font-size: 6px; padding: 4px; }.preview-stats b { font-size: 7px; }.preview-top { height: 33px; }.preview-demo { font-size: 6px; }.preview-time { display: none; }.preview-bottom > span { font-size: 5px; padding: 3px; }.preview-bottom b { font-size: 8px; }.viewport-preview .viewport-top, .viewport-preview .viewport-bottom { font-size: 5px; left: 5px; right: 5px; }.viewport-preview .viewport-top { top: 6px; }.viewport-preview .viewport-bottom { bottom: 6px; }.site-footer { height: auto; }.footer-inner { padding-top: 20px; padding-bottom: 20px; flex-wrap: wrap; gap: 10px; }.footer-subtitle { width: calc(100% - 125px); font-size: 9px; }.footer-motto { width: 100%; margin: 8px 0 0; font-size: 9px; }.dashboard-content { padding: 28px 5% 60px; }.dashboard-heading { gap: 10px; }.dashboard-heading h1 { font-size: 28px; }.dashboard-heading p:last-child { font-size: 11px; }.update-label { display: none; }.dashboard-status-row { grid-template-columns: 1fr; }.dashboard-telemetry { grid-template-columns: 1fr; }.section-caption { font-size: 9px; }.section-caption > span:last-child { text-align: right; }.value-pair strong { font-size: 22px; } }
 @media (prefers-reduced-motion: reduce) { *, *:before, *:after { animation-duration: .01ms !important; scroll-behavior: auto !important; transition-duration: .01ms !important; } }
 .viewport-unavailable .live-indicator { background: var(--warning); }
+
+
+.benchmark-content { max-width: 1500px; margin: auto; padding: 42px 5% 90px; min-height: calc(100vh - 133px); }
+.benchmark-hero { display:flex; align-items:end; justify-content:space-between; gap:30px; padding-bottom:30px; border-bottom:1px solid var(--border); }
+.benchmark-hero h1 { font-size:clamp(30px,3vw,44px); font-weight:500; margin:9px 0 4px; }
+.benchmark-hero p:last-child { margin:0; color:var(--muted-foreground); font-size:13px; }
+.benchmark-badge { min-width:190px; padding:14px 16px; border:1px solid var(--success); background:var(--card); font:10px var(--font-mono); color:var(--success); }
+.benchmark-badge small { display:block; margin-top:8px; color:var(--muted-foreground); font-size:9px; }
+.status-dot-live { display:inline-block; background:var(--success); margin-right:7px; }
+.benchmark-summary { display:grid; grid-template-columns:1fr 260px; gap:0; margin:25px 0 34px; border:1px solid var(--primary); background:linear-gradient(110deg,var(--card),var(--panel-glass)); box-shadow:0 0 30px var(--primary-glow); }
+.benchmark-summary-copy { padding:30px 32px; }
+.benchmark-kicker { display:block; color:var(--primary); font:10px var(--font-mono); letter-spacing:.16em; margin-bottom:12px; }
+.benchmark-summary-copy strong { display:block; color:var(--foreground); font:500 clamp(40px,5vw,66px) var(--font-mono); line-height:1; }
+.benchmark-summary-copy em { color:var(--primary); font-style:normal; font-size:.42em; }
+.benchmark-summary-copy p { max-width:520px; color:var(--muted-foreground); font-size:12px; margin:12px 0 0; }
+.benchmark-summary-side { border-left:1px solid var(--border); padding:25px; display:flex; flex-direction:column; justify-content:center; gap:5px; }
+.benchmark-summary-side span { color:var(--muted-foreground); font:9px var(--font-mono); letter-spacing:.12em; margin-top:8px; }
+.benchmark-summary-side b { color:var(--foreground); font:13px var(--font-mono); }
+.benchmark-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+.benchmark-card { min-height:150px; padding:19px; border:1px solid var(--border); background:var(--card); }
+.benchmark-card-top { display:flex; align-items:center; gap:9px; color:var(--muted-foreground); font:10px var(--font-mono); letter-spacing:.08em; }
+.benchmark-card-top svg { color:var(--primary); }
+.benchmark-value { margin-top:22px; color:var(--foreground); font:500 29px var(--font-mono); }
+.benchmark-value small { color:var(--primary); font-size:11px; margin-left:7px; }
+.benchmark-card p { margin:9px 0 0; color:var(--muted-foreground); font-size:10px; }
+.benchmark-analysis { display:grid; grid-template-columns:1.5fr 1fr; gap:25px; margin-top:35px; }
+.validation-list { border:1px solid var(--border); background:var(--card); }
+.validation-list > div { display:grid; grid-template-columns:22px 1fr auto; align-items:center; gap:10px; padding:15px 18px; border-bottom:1px solid var(--border); font:11px var(--font-mono); }
+.validation-list > div:last-child { border-bottom:0; }
+.validation-list svg { color:var(--success); }
+.validation-list span { color:var(--muted-foreground); }
+.validation-list strong { color:var(--success); font-weight:500; text-align:right; }
+.benchmark-note { border:1px solid var(--border); background:var(--card); padding:20px; }
+.benchmark-note span { color:var(--warning); font:10px var(--font-mono); letter-spacing:.12em; }
+.benchmark-note p { color:var(--muted-foreground); font-size:12px; line-height:1.7; margin-bottom:0; }
+.benchmark-note b { color:var(--foreground); font-weight:500; }
+@media (max-width:900px) { .benchmark-grid { grid-template-columns:repeat(2,1fr); } .benchmark-analysis { grid-template-columns:1fr; } }
+@media (max-width:760px) { .benchmark-hero { align-items:start; flex-direction:column; } .benchmark-summary { grid-template-columns:1fr; } .benchmark-summary-side { border-left:0; border-top:1px solid var(--border); } .benchmark-grid { grid-template-columns:1fr 1fr; } }
+@media (max-width:520px) { .benchmark-content { padding:28px 5% 60px; } .benchmark-grid { grid-template-columns:1fr; } .benchmark-summary-copy { padding:24px; } .validation-list > div { grid-template-columns:20px 1fr; } .validation-list strong { grid-column:2; text-align:left; } }
