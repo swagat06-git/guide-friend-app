@@ -1,15 +1,42 @@
-import type { TrackingResponse } from "@/types/tracking";
+import type { BenchmarkResponse, TrackingResponse } from "@/types/tracking";
 
 export const DEFAULT_API_BASE_URL = import.meta.env['VITE_API_BASE_URL'] || "http://127.0.0.1:8000";
 export const DEFAULT_POLL_INTERVAL = 100;
 
-async function request<T>(path: string, baseUrl: string): Promise<T> {
-  const response = await fetch(`${baseUrl.replace(/\/$/, "")}${path}`, { cache: "no-store" });
-  if (!response.ok) throw new Error(`ATLAS core returned ${response.status}`);
+async function request<T>(path: string, baseUrl: string, options?: RequestInit): Promise<T> {
+  const response = await fetch(`${baseUrl.replace(/\/$/, "")}${path}`, {
+    cache: "no-store",
+    ...options,
+  });
+
+  if (!response.ok) {
+    let detail = `ATLAS core returned ${response.status}`;
+
+    try {
+      const body = await response.json();
+      if (typeof body?.detail === "string") detail = body.detail;
+    } catch {
+      // Keep the HTTP status message when the server does not return JSON.
+    }
+
+    throw new Error(detail);
+  }
+
   return response.json() as Promise<T>;
 }
 
 export const api = {
-  health: (baseUrl = DEFAULT_API_BASE_URL) => request<{ status: string }>("/health", baseUrl),
-  getTracking: (baseUrl = DEFAULT_API_BASE_URL) => request<TrackingResponse>("/tracking", baseUrl),
+  health: (baseUrl = DEFAULT_API_BASE_URL) =>
+    request<{ status: string }>("/health", baseUrl),
+
+  getTracking: (baseUrl = DEFAULT_API_BASE_URL) =>
+    request<TrackingResponse>("/tracking", baseUrl),
+
+  getBenchmark: (baseUrl = DEFAULT_API_BASE_URL) =>
+    request<BenchmarkResponse | null>("/benchmark", baseUrl),
+
+  runBenchmark: (baseUrl = DEFAULT_API_BASE_URL) =>
+    request<BenchmarkResponse>("/benchmark", baseUrl, {
+      method: "POST",
+    }),
 };
