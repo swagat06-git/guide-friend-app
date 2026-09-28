@@ -7,7 +7,7 @@ export const formatNumber = (value: number | null | undefined, digits = 2) => ty
 export const formatTime = (timestamp: number | null | undefined) => typeof timestamp === "number" && Number.isFinite(timestamp) ? new Date(timestamp * 1000).toLocaleTimeString() : "N/A";
 
 export function Brand({ compact = false }: { compact?: boolean }) {
-  return <Link to="/" className={`atlas-brand ${compact ? "atlas-brand-small" : ""}`} aria-label="ATLAS Home"><Crosshair aria-hidden="true" strokeWidth={1.5} /><span>ATLAS</span></Link>;
+  return <Link to="/" className={`atlas-brand ${compact ? "atlas-brand-small" : ""}`} aria-label="ATLAS Home"><span className="atlas-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M16 2v7M16 23v7M2 16h7M23 16h7" /><circle cx="16" cy="16" r="9.5" /><circle cx="16" cy="16" r="3" /><path d="M7 7l5 5M25 7l-5 5M7 25l5-5M25 25l-5-5" /></svg></span><span>ATLAS</span></Link>;
 }
 
 export function SystemStatus() {
