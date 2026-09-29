@@ -1,4 +1,4 @@
-import type { BenchmarkResponse, TrackingResponse, VideoBenchmarkResponse } from "@/types/tracking";
+import type { BenchmarkResponse, TrackingResponse, VideoBenchmarkResponse, ScenarioBenchmarkResponse } from "@/types/tracking";
 
 export const DEFAULT_API_BASE_URL =
   import.meta.env['VITE_API_BASE_URL'] || "https://atlas-2ejd.onrender.com";
@@ -40,6 +40,21 @@ export const api = {
   runBenchmark: (baseUrl = DEFAULT_API_BASE_URL) =>
     request<BenchmarkResponse>("/benchmark", baseUrl, {
       method: "POST",
+    }),
+
+  runScenarioBenchmark: (
+    scenario: {
+      motion: string;
+      atmosphere: string;
+      noise_type: string;
+      noise_level: number;
+    },
+    baseUrl = DEFAULT_API_BASE_URL,
+  ) =>
+    request<ScenarioBenchmarkResponse>("/benchmark/scenario", baseUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(scenario),
     }),
 
   runVideoBenchmark: (file: File, baseUrl = DEFAULT_API_BASE_URL) => {
