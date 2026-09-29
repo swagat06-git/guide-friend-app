@@ -176,7 +176,7 @@ function BenchmarkLive(){
     <section style={{margin:"24px 0",display:"grid",gridTemplateColumns:"minmax(0,1fr) minmax(260px,360px)",gap:12}}>
       <div style={{padding:"18px",border:"1px solid var(--border)",background:"var(--card)"}}>
         <div className="section-caption"><span>LIVE TRACKING TELEMETRY</span><span>2 HZ SAMPLE</span></div>
-        <BenchmarkTelemetryStatus locked={Boolean(telemetry?.status.tracking)} fps={r?.benchmark.measured_processing_fps}/>
+        <BenchmarkTelemetryStatus online={Boolean(systemOnline)} locked={Boolean(telemetry?.status.tracking)}/>
         <div style={{display:"grid",gridTemplateColumns:"repeat(3,minmax(0,1fr))",gap:10,marginTop:10}}>
           <div className="benchmark-card"><div className="benchmark-card-top"><span>TARGET X</span></div><div className="benchmark-value">{f(telemetry?.target?.x,1)}<small>PX</small></div></div>
           <div className="benchmark-card"><div className="benchmark-card-top"><span>TARGET Y</span></div><div className="benchmark-value">{f(telemetry?.target?.y,1)}<small>PX</small></div></div>
