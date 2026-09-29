@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Activity, CheckCircle2, Clock3, Gauge, LockKeyhole, Play, Target, Zap } from "lucide-react";
 import { Footer, Header } from "@/components/AtlasUI";
 import { api, DEFAULT_API_BASE_URL } from "@/services/api";
-import type { BenchmarkResponse } from "@/types/tracking";
+import type { BenchmarkResponse, VideoBenchmarkResponse } from "@/types/tracking";
 
 export const Route = createFileRoute("/benchmark-live")({
   head: () => ({ meta: [
@@ -20,6 +20,11 @@ function BenchmarkLive(){
   const [busy,setBusy]=useState(false);
   const [loading,setLoading]=useState(true);
   const [error,setError]=useState("");
+  const [testOpen,setTestOpen]=useState(false);
+  const [testBusy,setTestBusy]=useState(false);
+  const [testData,setTestData]=useState<VideoBenchmarkResponse|null>(null);
+  const [testError,setTestError]=useState("");
+  const fileRef=useRef<HTMLInputElement>(null);
 
   useEffect(()=>{ api.getBenchmark().then(setData).catch(e=>setError(e instanceof Error?e.message:"Unable to load benchmark.")).finally(()=>setLoading(false)); },[]);
 
@@ -29,6 +34,17 @@ function BenchmarkLive(){
     try{setData(await api.runBenchmark());}
     catch(e){setError(e instanceof Error?e.message:"Benchmark failed.");}
     finally{setBusy(false);}
+  }
+
+  async function runVideoTest(file: File){
+    if(testBusy)return;
+    setTestBusy(true);setTestError("");setTestData(null);
+    try{
+      if(!file.name.toLowerCase().endsWith(".mp4")) throw new Error("Only MP4 video uploads are supported.");
+      if(file.size>100*1024*1024) throw new Error("Video file is too large. Maximum upload size is 100 MB.");
+      setTestData(await api.runVideoBenchmark(file));
+    }catch(e){setTestError(e instanceof Error?e.message:"MP4 benchmark failed.");}
+    finally{setTestBusy(false);}
   }
 
   const r=data?.result;
@@ -45,8 +61,9 @@ function BenchmarkLive(){
   return <div className="atlas-site dashboard-site"><Header active="benchmark"/><main className="benchmark-content">
     <div className="benchmark-hero"><div><p className="eyebrow">ATLAS / PERFORMANCE VALIDATION</p><h1>Benchmark Results</h1><p>Run the benchmark against the actual tracking backend and refresh these measurements.</p></div>
       <div style={{display:"flex",alignItems:"stretch",gap:12,flexDirection:"column"}}><div className="benchmark-badge"><span className="status-dot status-dot-live"/><span>{busy?"BENCHMARK RUNNING":"BENCHMARK READY"}</span><small>{r?`${r.video.frames} FRAMES · ${f(r.video.fps,0)} FPS · ${f(r.video.duration_seconds,1)} S`:"READY FOR TEST RUN"}</small></div>
-      <button type="button" onClick={()=>void run()} disabled={busy||loading} style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,padding:"12px 16px",border:"1px solid var(--primary)",background:"var(--accent)",color:"var(--primary)",font:"11px var(--font-mono)",cursor:busy||loading?"wait":"pointer",opacity:(busy||loading)?0.55:1}}><Play size={15} fill="currentColor"/>{busy?"RUNNING...":"RUN BENCHMARK"}</button></div>
+      <div style={{display:"flex",gap:8}}><button type="button" onClick={()=>setTestOpen(v=>!v)} disabled={busy||loading} style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,padding:"12px 16px",border:"1px solid var(--border)",background:"transparent",color:"var(--foreground)",font:"11px var(--font-mono)",cursor:"pointer"}}>TEST MP4</button><button type="button" onClick={()=>void run()} disabled={busy||loading} style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,padding:"12px 16px",border:"1px solid var(--primary)",background:"var(--accent)",color:"var(--primary)",font:"11px var(--font-mono)",cursor:busy||loading?"wait":"pointer",opacity:(busy||loading)?0.55:1}}><Play size={15} fill="currentColor"/>{busy?"RUNNING...":"RUN BENCHMARK"}</button></div></div>
     </div>
+    {testOpen&&<section style={{margin:"24px 0",padding:"20px",border:"1px solid var(--border)",background:"var(--card)"}}><div className="section-caption"><span>TEST MP4</span><span>640×480 · ~30 FPS · MAX 30 S / 100 MB</span></div><input ref={fileRef} type="file" accept=".mp4,video/mp4" style={{display:"none"}} onChange={e=>{const file=e.target.files?.[0];if(file)void runVideoTest(file);e.currentTarget.value="";}}/><div style={{display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}><button type="button" onClick={()=>fileRef.current?.click()} disabled={testBusy} style={{padding:"11px 15px",border:"1px solid var(--primary)",background:"var(--accent)",color:"var(--primary)",font:"11px var(--font-mono)",cursor:testBusy?"wait":"pointer"}}>{testBusy?"PROCESSING...":"SELECT MP4"}</button><span style={{color:"var(--muted-foreground)",fontSize:12}}>Upload a recorded beacon-tracking video. The existing benchmark remains unchanged.</span></div>{testError&&<div style={{marginTop:14,color:"var(--destructive)",fontSize:12}}>{testError}</div>}{testData&&(()=>{const v=testData.result;return <div style={{marginTop:20,display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))",gap:10}}>{[["Processing FPS",f(v.benchmark.measured_processing_fps)],["Detection rate",f(v.tracking.detection_rate_percent)+"%"],["Lock retention",f(v.tracking.lock_retention_percent)+"%"],["Acquisition",f(v.tracking.acquisition_time_seconds,3)+" s"],["Target loss",f(v.tracking.target_loss_percent)+"%"]].map(([label,value])=><div key={label} className="benchmark-card"><div className="benchmark-card-top"><span>{label}</span></div><div className="benchmark-value">{value}</div></div>)}<div style={{gridColumn:"1 / -1",fontSize:11,color:"var(--muted-foreground)"}}>{v.accuracy.ground_truth_available?"Centroid accuracy calculated from supplied ground truth.":"Centroid error / RMSE are not shown because the uploaded MP4 has no matching ground-truth file."}</div></div>})()}</section>}
     {error&&<div style={{margin:"24px 0",padding:"15px 18px",border:"1px solid var(--destructive)",background:"var(--card)",color:"var(--foreground)",display:"flex",flexDirection:"column",gap:5}}><strong>Benchmark unavailable</strong><span style={{color:"var(--muted-foreground)",fontSize:12}}>{error}</span><small style={{fontFamily:"var(--font-mono)",color:"var(--muted-foreground)"}}>Backend: {DEFAULT_API_BASE_URL}</small></div>}
     {loading&&<div className="benchmark-loading" style={{padding:"30px 0",color:"var(--muted-foreground)",fontFamily:"var(--font-mono)",fontSize:11}}>LOADING LAST BENCHMARK...</div>}
     {r&&<><section className="benchmark-summary"><div className="benchmark-summary-copy"><span className="benchmark-kicker">PRIMARY RESULT</span><strong>{f(r.accuracy.average_centroid_error_pixels,3)} <em>px</em></strong><p>Average centroiding error. Last run: {new Date(data!.generated_at*1000).toLocaleString()}.</p></div><div className="benchmark-summary-side"><span>INPUT</span><b>{f(r.video.fps,0)} FPS MP4</b><span>PROCESSING</span><b>{f(r.benchmark.measured_processing_fps)} FPS</b></div></section>
