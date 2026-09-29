@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AtlasProvider } from "../components/AtlasCore";
+import { CursorFX } from "../components/CursorFX";
 
 function NotFoundComponent() {
   return (
@@ -122,7 +123,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <AtlasProvider><Outlet /></AtlasProvider>
+      <AtlasProvider><CursorFX /><Outlet /></AtlasProvider>
     </QueryClientProvider>
   );
 }
