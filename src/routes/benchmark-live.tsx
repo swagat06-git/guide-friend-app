@@ -55,9 +55,30 @@ function BenchmarkLive(){
   const [testBusy,setTestBusy]=useState(false);
   const [testData,setTestData]=useState<VideoBenchmarkResponse|null>(null);
   const [testError,setTestError]=useState("");
+  const [telemetry,setTelemetry]=useState<{x:number|null;y:number|null;error:number|null;tracking:boolean;detected:boolean;pan:number|null;tilt:number|null}>({x:null,y:null,error:null,tracking:false,detected:false,pan:null,tilt:null});
+  const [errorHistory,setErrorHistory]=useState<number[]>([]);
   const fileRef=useRef<HTMLInputElement>(null);
 
   useEffect(()=>{ api.getBenchmark().then(setData).catch(e=>setError(e instanceof Error?e.message:"Unable to load benchmark.")).finally(()=>setLoading(false)); },[]);
+  useEffect(()=>{
+    let active=true;
+    const poll=async()=>{
+      try{
+        const t=await api.getTracking();
+        if(!active)return;
+        const x=t.target?.x??null;
+        const y=t.target?.y??null;
+        const errorPx=x!=null&&y!=null?Math.hypot(x-320,y-240):null;
+        setTelemetry({x,y,error:errorPx,tracking:t.status.tracking,detected:t.status.detected,pan:t.camera?.pan_speed??null,tilt:t.camera?.tilt_speed??null});
+        if(errorPx!=null)setErrorHistory(h=>[...h,errorPx].slice(-60));
+      }catch{
+        // Keep the last telemetry frame visible when the backend is waking up.
+      }
+    };
+    void poll();
+    const timer=window.setInterval(()=>void poll(),500);
+    return()=>{active=false;window.clearInterval(timer);};
+  },[]);
 
   async function run(){
     if(busy)return;
@@ -115,6 +136,27 @@ function BenchmarkLive(){
     </div>})()}</section>}
     {error&&<div style={{margin:"24px 0",padding:"15px 18px",border:"1px solid var(--destructive)",background:"var(--card)",color:"var(--foreground)",display:"flex",flexDirection:"column",gap:5}}><strong>Benchmark unavailable</strong><span style={{color:"var(--muted-foreground)",fontSize:12}}>{error}</span><small style={{fontFamily:"var(--font-mono)",color:"var(--muted-foreground)"}}>Backend: {DEFAULT_API_BASE_URL}</small></div>}
     {loading&&<div className="benchmark-loading" style={{padding:"30px 0",color:"var(--muted-foreground)",fontFamily:"var(--font-mono)",fontSize:11}}>LOADING LAST BENCHMARK...</div>}
+    <section style={{marginTop:24}}>
+      <div className="section-caption"><span>LIVE TRACKING TELEMETRY</span><span>500 MS SAMPLE</span></div>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(145px,1fr))",gap:10}}>
+        {[
+          ["STATUS",telemetry.tracking?"LOCKED":telemetry.detected?"ACQUIRING":"SEARCHING"],
+          ["CENTROID X",telemetry.x==null?"—":f(telemetry.x,1)+" px"],
+          ["CENTROID Y",telemetry.y==null?"—":f(telemetry.y,1)+" px"],
+          ["CURRENT ERROR",telemetry.error==null?"—":f(telemetry.error,2)+" px"],
+          ["PAN COMMAND",telemetry.pan==null?"—":f(telemetry.pan,2)],
+          ["TILT COMMAND",telemetry.tilt==null?"—":f(telemetry.tilt,2)],
+        ].map(([label,value])=><div className="benchmark-card" key={label}><div className="benchmark-card-top"><span>{label}</span></div><div className="benchmark-value" style={{fontSize:20}}>{value}</div></div>)}
+      </div>
+      <div style={{marginTop:12,padding:"14px 16px",border:"1px solid var(--border)",background:"var(--card)"}}>
+        <div className="section-caption"><span>CURRENT ERROR TRACE</span><span>CAMERA CENTER = 320 / 240</span></div>
+        {errorHistory.length>1?<svg viewBox="0 0 600 150" width="100%" height="150" role="img" aria-label="Live centroid error over recent samples" preserveAspectRatio="none" style={{display:"block",marginTop:12}}>
+          <line x1="0" y1={150-(10/Math.max(10,...errorHistory))*150} x2="600" y2={150-(10/Math.max(10,...errorHistory))*150} stroke="currentColor" strokeOpacity="0.45" strokeDasharray="5 5"/>
+          <polyline fill="none" stroke="var(--accent)" strokeWidth="2" points={errorHistory.map((v,i)=>{const max=Math.max(10,...errorHistory);return `${i/(errorHistory.length-1)*600},${150-v/max*150}`;}).join(" ")}/>
+        </svg>:<div style={{height:150,display:"grid",placeItems:"center",color:"var(--muted-foreground)",fontSize:11}}>WAITING FOR TRACKING SAMPLES...</div>}
+        <div style={{fontSize:10,color:"var(--muted-foreground)"}}>The trace is live telemetry from the tracking endpoint; it is not substituted for benchmark ground-truth accuracy.</div>
+      </div>
+    </section>
     {r&&<><section className="benchmark-summary"><div className="benchmark-summary-copy"><span className="benchmark-kicker">PRIMARY RESULT</span><strong>{f(r.accuracy.average_centroid_error_pixels,3)} <em>px</em></strong><p>Average centroiding error. Last run: {new Date(data!.generated_at*1000).toLocaleString()}.</p></div><div className="benchmark-summary-side"><span>INPUT</span><b>{f(r.video.fps,0)} FPS MP4</b><span>PROCESSING</span><b>{f(r.benchmark.measured_processing_fps)} FPS</b></div></section>
     <section><div className="section-caption"><span>MEASURED PERFORMANCE</span><span>LAST COMPLETED RUN</span></div><div className="benchmark-grid">{cards.map(([label,value,unit,Icon,note])=>{const I=Icon as typeof Gauge;return <article className="benchmark-card" key={label as string}><div className="benchmark-card-top"><I size={17}/><span>{label as string}</span></div><div className="benchmark-value">{value as string}<small>{unit as string}</small></div><p>{note as string}</p></article>})}</div></section>
     <section style={{marginTop:18}}><div className="section-caption"><span>REPORTING</span><span>EXPORT VERIFIED RESULT</span></div><div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:14,flexWrap:"wrap",padding:"16px 0"}}><div style={{display:"flex",alignItems:"center",gap:10}}><BarChart3 size={18}/><span style={{fontSize:12,color:"var(--muted-foreground)"}}>Download the measured benchmark as machine-readable evidence for your technical report.</span></div><div style={{display:"flex",gap:8}}><button type="button" onClick={()=>exportBenchmarkJson(r)} style={{display:"flex",alignItems:"center",gap:7,padding:"9px 12px",border:"1px solid var(--border)",background:"transparent",color:"var(--foreground)",font:"10px var(--font-mono)",cursor:"pointer"}}><Download size={13}/> JSON</button><button type="button" onClick={()=>exportBenchmarkCsv(r)} style={{display:"flex",alignItems:"center",gap:7,padding:"9px 12px",border:"1px solid var(--border)",background:"transparent",color:"var(--foreground)",font:"10px var(--font-mono)",cursor:"pointer"}}><Download size={13}/> CSV</button></div></div></section>
