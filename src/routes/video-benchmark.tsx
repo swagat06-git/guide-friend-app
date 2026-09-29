@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AlertTriangle, ArrowLeft, CheckCircle2, Gauge, LockKeyhole, Play, Target, Upload, X } from "lucide-react";
 import { Footer, Header } from "@/components/AtlasUI";
-import { api, DEFAULT_API_BASE_URL } from "@/services/api";
+import { api } from "@/services/api";
 import type { VideoBenchmarkResponse } from "@/types/tracking";
 
 export const Route = createFileRoute("/video-benchmark")({
