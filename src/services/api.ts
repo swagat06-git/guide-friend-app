@@ -1,4 +1,4 @@
-import type { BenchmarkResponse, TrackingResponse } from "@/types/tracking";
+import type { BenchmarkResponse, TrackingResponse, VideoBenchmarkResponse } from "@/types/tracking";
 
 export const DEFAULT_API_BASE_URL = import.meta.env['VITE_API_BASE_URL'] || "http://127.0.0.1:8000";
 export const DEFAULT_POLL_INTERVAL = 100;
@@ -39,4 +39,14 @@ export const api = {
     request<BenchmarkResponse>("/benchmark", baseUrl, {
       method: "POST",
     }),
+
+  runVideoBenchmark: (file: File, baseUrl = DEFAULT_API_BASE_URL) => {
+    const formData = new FormData();
+    formData.append("video", file);
+
+    return request<VideoBenchmarkResponse>("/benchmark/video", baseUrl, {
+      method: "POST",
+      body: formData,
+    });
+  },
 };
