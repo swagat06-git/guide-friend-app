@@ -177,6 +177,6 @@
 
 
 /* ATLAS cursor field */
-.atlas-cursor{position:fixed;left:var(--cursor-x,50vw);top:var(--cursor-y,50vh);width:28px;height:28px;transform:translate(-50%,-50%);border:1px solid var(--primary);border-radius:50%;pointer-events:none;z-index:9999;box-shadow:0 0 18px var(--primary-glow);transition:left .06s linear,top .06s linear;mix-blend-mode:screen}
+.atlas-cursor{position:fixed;left:0;top:0;width:28px;height:28px;transform:translate3d(calc(var(--cursor-x, 50vw) - 50%),calc(var(--cursor-y, 50vh) - 50%),0);border:1px solid var(--primary);border-radius:50%;pointer-events:none;z-index:9999;box-shadow:0 0 18px var(--primary-glow);will-change:transform;mix-blend-mode:screen}
 .atlas-cursor::after{content:"";position:absolute;left:50%;top:50%;width:4px;height:4px;transform:translate(-50%,-50%);border-radius:50%;background:var(--primary);box-shadow:0 0 10px var(--primary)}
 @media (pointer:coarse),(prefers-reduced-motion:reduce){.atlas-cursor{display:none}}
