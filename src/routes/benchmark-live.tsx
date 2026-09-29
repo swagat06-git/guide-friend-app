@@ -120,6 +120,32 @@ function BenchmarkLive(){
       </div>
     </section>
     {r&&<><section className="benchmark-summary"><div className="benchmark-summary-copy"><span className="benchmark-kicker">PRIMARY RESULT</span><strong>{f(r.accuracy.average_centroid_error_pixels,3)} <em>px</em></strong><p>Average centroiding error. Last run: {new Date(data!.generated_at*1000).toLocaleString()}.</p></div><div className="benchmark-summary-side"><span>INPUT</span><b>{f(r.video.fps,0)} FPS MP4</b><span>PROCESSING</span><b>{f(r.benchmark.measured_processing_fps)} FPS</b></div></section>
+    <section style={{margin:"24px 0",padding:"18px",border:"1px solid var(--border)",background:"var(--card)"}}>
+      <div className="section-caption"><span>ACCURACY PROFILE</span><span>PIXEL ERROR · VERIFIED RUN</span></div>
+      {r&&<div style={{display:"grid",gap:14}}>
+        {[
+          ["AVERAGE ERROR",r.accuracy.average_centroid_error_pixels,10],
+          ["RMSE",r.accuracy.rmse_pixels,10],
+          ["MAXIMUM ERROR",r.accuracy.maximum_centroid_error_pixels,null],
+        ].map(([label,value,limit])=>{
+          const numeric=typeof value==="number"?value:null;
+          const scale=Math.max(10,numeric??10);
+          return <div key={label as string} style={{display:"grid",gridTemplateColumns:"130px minmax(0,1fr) 72px",gap:12,alignItems:"center"}}>
+            <span style={{font:"10px var(--font-mono)"}}>{label as string}</span>
+            <div style={{position:"relative",height:8,background:"var(--muted)",overflow:"hidden"}}>
+              {limit!=null&&<span style={{position:"absolute",left:`${Math.min(100,(limit/scale)*100)}%`,top:-4,bottom:-4,width:1,background:"var(--foreground)",opacity:.7}}/>}
+              <span style={{display:"block",height:"100%",width:`${Math.min(100,((numeric??0)/scale)*100)}%`,background:"var(--accent)"}}/>
+            </div>
+            <strong style={{font:"11px var(--font-mono)",textAlign:"right"}}>{f(numeric,3)} px</strong>
+          </div>
+        })}
+        <div style={{display:"flex",justifyContent:"space-between",gap:12,fontSize:10,color:"var(--muted-foreground)"}}>
+          <span>REFERENCE: 10 PX AVERAGE-ERROR REQUIREMENT</span>
+          <span>MAXIMUM ERROR IS REPORTED SEPARATELY</span>
+        </div>
+        <div style={{fontSize:11,color:"var(--muted-foreground)",lineHeight:1.5}}>This profile uses the verified benchmark measurements already served by the backend. It does not fabricate a frame-by-frame error series; the live trace above is the current control-offset telemetry.</div>
+      </div>}
+    </section>
     <section><div className="section-caption"><span>MEASURED PERFORMANCE</span><span>LAST COMPLETED RUN</span></div><div className="benchmark-grid">{cards.map(([label,value,unit,Icon,note])=>{const I=Icon as typeof Gauge;return <article className="benchmark-card" key={label as string}><div className="benchmark-card-top"><I size={17}/><span>{label as string}</span></div><div className="benchmark-value">{value as string}<small>{unit as string}</small></div><p>{note as string}</p></article>})}</div></section>
     <section className="benchmark-analysis"><div><div className="section-caption"><span>VALIDATION STATUS</span><span>REQUIREMENT CHECK</span></div><div className="validation-list">
       <div><CheckCircle2 size={16}/><span>Average tracking error ≤ 10 px</span><strong>{r.accuracy.average_centroid_error_pixels!=null&&r.accuracy.average_centroid_error_pixels<=10?"PASS":"FAIL"} · {f(r.accuracy.average_centroid_error_pixels,3)} px</strong></div>
