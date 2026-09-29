@@ -1,11 +1,17 @@
 import { Activity } from "lucide-react";
 
 type Props = {
+  online: boolean;
   locked: boolean;
-  fps?: number | null;
 };
 
-export function BenchmarkTelemetryStatus({ locked, fps }: Props) {
+export function BenchmarkTelemetryStatus({ online, locked }: Props) {
+  const label = !online
+    ? "TRACKING STREAM OFFLINE"
+    : locked
+      ? "TRACKING LOCKED"
+      : "TRACKING ACTIVE";
+
   return (
     <div
       style={{
@@ -22,10 +28,10 @@ export function BenchmarkTelemetryStatus({ locked, fps }: Props) {
     >
       <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <Activity size={13} />
-        <strong>{locked ? "TRACKING LOCKED" : "TRACKING ACTIVE"}</strong>
+        <strong>{label}</strong>
       </span>
       <span style={{ color: "var(--muted-foreground)" }}>
-        {fps == null ? "FPS —" : `FPS ${fps.toFixed(2)}`}
+        {online ? "SAMPLE 2 HZ" : "FPS —"}
       </span>
     </div>
   );
