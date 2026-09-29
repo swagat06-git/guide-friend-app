@@ -151,6 +151,25 @@ function BenchmarkLive(){
         <p style={{margin:"8px 0 0",fontSize:10,color:"var(--muted-foreground)"}}>Live alignment offset from the 640×480 frame center. This is a control telemetry trace, not the benchmark centroid RMSE.</p>
       </div>
     </section>
+    {r&&<section style={{margin:"24px 0",padding:"18px",border:"1px solid var(--border)",background:"var(--card)"}}>
+      <div className="section-caption"><span>BENCHMARK SCENARIO</span><span>VERIFIED INPUT PROFILE</span></div>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(4,minmax(0,1fr))",gap:10}}>
+        {[
+          ["FRAME SIZE",`${r.video.width} × ${r.video.height}`],
+          ["INPUT RATE",`${f(r.video.fps,0)} FPS`],
+          ["FRAME COUNT",String(r.video.frames)],
+          ["DURATION",`${f(r.video.duration_seconds,1)} S`],
+          ["DETECTIONS",String(r.tracking.detected_frames)],
+          ["TRACKING FRAMES",String(r.tracking.tracking_frames)],
+          ["ERROR SAMPLES",String(r.accuracy.frames_with_error)],
+          ["FIRST DETECTION",`FRAME ${r.tracking.first_detection_frame ?? "—"}`],
+        ].map(([label,value])=><div key={label} className="benchmark-card">
+          <div className="benchmark-card-top"><span>{label}</span></div>
+          <div className="benchmark-value" style={{fontSize:18}}>{value}</div>
+        </div>)}
+      </div>
+      <p style={{margin:"12px 0 0",fontSize:10,color:"var(--muted-foreground)"}}>These are the actual inputs and counts associated with the verified benchmark result currently served by the backend.</p>
+    </section>}
     {r&&<><section className="benchmark-summary"><div className="benchmark-summary-copy"><span className="benchmark-kicker">PRIMARY RESULT</span><strong>{f(r.accuracy.average_centroid_error_pixels,3)} <em>px</em></strong><p>Average centroiding error. Last run: {new Date(data!.generated_at*1000).toLocaleString()}.</p></div><div className="benchmark-summary-side"><span>INPUT</span><b>{f(r.video.fps,0)} FPS MP4</b><span>PROCESSING</span><b>{f(r.benchmark.measured_processing_fps)} FPS</b></div></section>
     <section style={{margin:"24px 0",padding:"18px",border:"1px solid var(--border)",background:"var(--card)"}}>
       <div className="section-caption"><span>ACCURACY PROFILE</span><span>PIXEL ERROR · VERIFIED RUN</span></div>
