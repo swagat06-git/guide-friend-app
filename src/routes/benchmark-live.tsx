@@ -1,4 +1,3 @@
-import { BenchmarkTelemetryStatus } from "@/components/benchmark/BenchmarkTelemetryStatus";
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Activity, CheckCircle2, Clock3, Gauge, LockKeyhole, Play, Target, Zap } from "lucide-react";
