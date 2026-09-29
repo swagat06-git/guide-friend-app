@@ -72,6 +72,13 @@ function BenchmarkLive(){
   const [testBusy,setTestBusy]=useState(false);
   const [testData,setTestData]=useState<VideoBenchmarkResponse|null>(null);
   const [testError,setTestError]=useState("");
+  const [scenarioMotion,setScenarioMotion]=useState("linear");
+  const [scenarioAtmosphere,setScenarioAtmosphere]=useState("clear");
+  const [scenarioNoise,setScenarioNoise]=useState("none");
+  const [scenarioNoiseLevel,setScenarioNoiseLevel]=useState(0);
+  const [scenarioBusy,setScenarioBusy]=useState(false);
+  const [scenarioData,setScenarioData]=useState<ScenarioBenchmarkResponse|null>(null);
+  const [scenarioError,setScenarioError]=useState("");
   const [telemetry,setTelemetry]=useState<TrackingResponse|null>(null);
   const [telemetrySamples,setTelemetrySamples]=useState<number[]>([]);
   const [systemOnline,setSystemOnline]=useState<boolean|null>(null);
@@ -139,6 +146,25 @@ function BenchmarkLive(){
     finally{setBusy(false);}
   }
 
+  async function runScenarioTest(){
+    if(scenarioBusy)return;
+    setScenarioBusy(true);
+    setScenarioError("");
+    setScenarioData(null);
+    try{
+      setScenarioData(await api.runScenarioBenchmark({
+        motion: scenarioMotion,
+        atmosphere: scenarioAtmosphere,
+        noise_type: scenarioNoise,
+        noise_level: scenarioNoiseLevel,
+      }));
+    }catch(e){
+      setScenarioError(e instanceof Error?e.message:"Scenario benchmark failed.");
+    }finally{
+      setScenarioBusy(false);
+    }
+  }
+
   async function runVideoTest(file: File){
     if(testBusy)return;
     setTestBusy(true);setTestError("");setTestData(null);
@@ -167,6 +193,51 @@ function BenchmarkLive(){
       <div style={{display:"flex",gap:8}}><button type="button" onClick={()=>setTestOpen(v=>!v)} disabled={busy||loading} style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,padding:"12px 16px",border:"1px solid var(--border)",background:"transparent",color:"var(--foreground)",font:"11px var(--font-mono)",cursor:"pointer"}}>TEST MP4</button><button type="button" onClick={()=>void run()} disabled={busy||loading} style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,padding:"12px 16px",border:"1px solid var(--primary)",background:"var(--accent)",color:"var(--primary)",font:"11px var(--font-mono)",cursor:busy||loading?"wait":"pointer",opacity:(busy||loading)?0.55:1}}><Play size={15} fill="currentColor"/>{busy?"RUNNING...":"RUN BENCHMARK"}</button></div></div>
     </div>
     {testOpen&&<section style={{margin:"24px 0",padding:"20px",border:"1px solid var(--border)",background:"var(--card)"}}><div className="section-caption"><span>TEST MP4</span><span>640×480 · ~30 FPS · MAX 30 S / 100 MB</span></div><input ref={fileRef} type="file" accept=".mp4,video/mp4" style={{display:"none"}} onChange={e=>{const file=e.target.files?.[0];if(file)void runVideoTest(file);e.currentTarget.value="";}}/><div style={{display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}><button type="button" onClick={()=>fileRef.current?.click()} disabled={testBusy} style={{padding:"11px 15px",border:"1px solid var(--primary)",background:"var(--accent)",color:"var(--primary)",font:"11px var(--font-mono)",cursor:testBusy?"wait":"pointer"}}>{testBusy?"PROCESSING...":"SELECT MP4"}</button><span style={{color:"var(--muted-foreground)",fontSize:12}}>Upload a recorded beacon-tracking video. The existing benchmark remains unchanged.</span></div>{testError&&<div style={{marginTop:14,color:"var(--destructive)",fontSize:12}}>{testError}</div>}{testData&&(()=>{const v=testData.result;return <div style={{marginTop:20,display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))",gap:10}}>{[["Processing FPS",f(v.benchmark.measured_processing_fps)],["Detection rate",f(v.tracking.detection_rate_percent)+"%"],["Lock retention",f(v.tracking.lock_retention_percent)+"%"],["Acquisition",f(v.tracking.acquisition_time_seconds,3)+" s"],["Target loss",f(v.tracking.target_loss_percent)+"%"]].map(([label,value])=><div key={label} className="benchmark-card"><div className="benchmark-card-top"><span>{label}</span></div><div className="benchmark-value">{value}</div></div>)}<div style={{gridColumn:"1 / -1",fontSize:11,color:"var(--muted-foreground)"}}>{v.accuracy.ground_truth_available?"Centroid accuracy calculated from supplied ground truth.":"Centroid error / RMSE are not shown because the uploaded MP4 has no matching ground-truth file."}</div><div style={{gridColumn:"1 / -1",display:"flex",gap:8,flexWrap:"wrap",marginTop:4}}><button type="button" onClick={()=>downloadBenchmark("atlas-video-benchmark.json",JSON.stringify(v,null,2),"application/json")} style={{display:"flex",alignItems:"center",gap:7,padding:"9px 12px",border:"1px solid var(--border)",background:"transparent",color:"var(--foreground)",font:"10px var(--font-mono)",cursor:"pointer"}}><Download size={13}/> EXPORT JSON</button><button type="button" onClick={()=>downloadBenchmark("atlas-video-benchmark.csv",`metric,value\nprocessing_fps,${v.benchmark.measured_processing_fps}\ndetection_rate_percent,${v.tracking.detection_rate_percent}\nlock_retention_percent,${v.tracking.lock_retention_percent}\nacquisition_time_seconds,${v.tracking.acquisition_time_seconds??""}\ntarget_loss_percent,${v.tracking.target_loss_percent}`,"text/csv")} style={{display:"flex",alignItems:"center",gap:7,padding:"9px 12px",border:"1px solid var(--border)",background:"transparent",color:"var(--foreground)",font:"10px var(--font-mono)",cursor:"pointer"}}><Download size={13}/> EXPORT CSV</button></div></div>})()}</section>}
+    <section style={{margin:"24px 0",padding:"20px",border:"1px solid var(--border)",background:"var(--card)"}}>
+      <div className="section-caption"><span>SCENARIO BENCHMARK</span><span>10 S · 300 FRAMES · LIVE SIMULATION</span></div>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(4,minmax(150px,1fr))",gap:10,marginTop:14}}>
+        <label style={{display:"grid",gap:7,font:"10px var(--font-mono)"}}>MOTION
+          <select value={scenarioMotion} onChange={e=>setScenarioMotion(e.target.value)} style={{padding:"11px",background:"var(--background)",color:"var(--foreground)",border:"1px solid var(--border)",font:"11px var(--font-mono)"}}>
+            <option value="linear">LINEAR</option><option value="circular">CIRCULAR</option><option value="figure8">FIGURE-8</option><option value="random">RANDOM</option>
+          </select>
+        </label>
+        <label style={{display:"grid",gap:7,font:"10px var(--font-mono)"}}>ATMOSPHERE
+          <select value={scenarioAtmosphere} onChange={e=>setScenarioAtmosphere(e.target.value)} style={{padding:"11px",background:"var(--background)",color:"var(--foreground)",border:"1px solid var(--border)",font:"11px var(--font-mono)"}}>
+            <option value="clear">CLEAR</option><option value="haze">HAZE</option><option value="fog">FOG</option><option value="rain">RAIN</option><option value="low_light">LOW LIGHT</option>
+          </select>
+        </label>
+        <label style={{display:"grid",gap:7,font:"10px var(--font-mono)"}}>NOISE
+          <select value={scenarioNoise} onChange={e=>{setScenarioNoise(e.target.value);if(e.target.value==="none")setScenarioNoiseLevel(0);}} style={{padding:"11px",background:"var(--background)",color:"var(--foreground)",border:"1px solid var(--border)",font:"11px var(--font-mono)"}}>
+            <option value="none">NONE</option><option value="gaussian">GAUSSIAN</option><option value="salt_pepper">SALT & PEPPER</option><option value="poisson">POISSON</option>
+          </select>
+        </label>
+        <label style={{display:"grid",gap:7,font:"10px var(--font-mono)"}}>NOISE LEVEL
+          <input type="number" min="0" max="20" step="1" value={scenarioNoiseLevel} disabled={scenarioNoise==="none"} onChange={e=>setScenarioNoiseLevel(Math.max(0,Math.min(20,Number(e.target.value)||0)))} style={{padding:"10px",background:"var(--background)",color:"var(--foreground)",border:"1px solid var(--border)",font:"11px var(--font-mono)",opacity:scenarioNoise==="none"?.5:1}} />
+        </label>
+      </div>
+      <div style={{display:"flex",alignItems:"center",gap:12,marginTop:14,flexWrap:"wrap"}}>
+        <button type="button" onClick={()=>void runScenarioTest()} disabled={scenarioBusy||loading||systemOnline!==true} style={{padding:"11px 15px",border:"1px solid var(--primary)",background:"var(--accent)",color:"var(--primary)",font:"10px var(--font-mono)",cursor:scenarioBusy?"wait":"pointer",opacity:(scenarioBusy||loading||systemOnline!==true)?.55:1}}>
+          {scenarioBusy?"RUNNING SCENARIO...":"RUN SELECTED SCENARIO"}
+        </button>
+        <span style={{fontSize:11,color:"var(--muted-foreground)"}}>Select a target motion and environmental condition, then run a fresh benchmark against the simulator.</span>
+      </div>
+      {scenarioError&&<div style={{marginTop:12,color:"var(--destructive)",fontSize:11}}>{scenarioError}</div>}
+      {scenarioData&&<div style={{marginTop:18}}>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(6,minmax(120px,1fr))",gap:10}}>
+          {[
+            ["AVG ERROR",f(scenarioData.accuracy.average_centroid_error_pixels,2)+" px"],
+            ["RMSE",f(scenarioData.accuracy.rmse_pixels,2)+" px"],
+            ["MAX ERROR",f(scenarioData.accuracy.maximum_centroid_error_pixels,2)+" px"],
+            ["PROCESSING",f(scenarioData.benchmark.measured_processing_fps)+" FPS"],
+            ["LOCK",f(scenarioData.tracking.lock_retention_percent)+"%"],
+            ["ACQUISITION",f(scenarioData.tracking.acquisition_time_seconds,3)+" s"],
+          ].map(([label,value])=><div className="benchmark-card" key={label}><div className="benchmark-card-top"><span>{label}</span></div><div className="benchmark-value" style={{fontSize:18}}>{value}</div></div>)}
+        </div>
+        <div style={{marginTop:10,font:"10px var(--font-mono)",color:"var(--muted-foreground)"}}>
+          {scenarioData.scenario.motion.toUpperCase()} · {scenarioData.scenario.atmosphere.toUpperCase()} · {scenarioData.scenario.noise_type.toUpperCase()} · LEVEL {scenarioData.scenario.noise_level}
+        </div>
+      </div>}
+    </section>
     <section style={{margin:"24px 0",display:"grid",gridTemplateColumns:"repeat(3,minmax(0,1fr))",gap:10}}>
       {[
         ["BACKEND API",systemOnline===null?"CHECKING":systemOnline?"ONLINE":"OFFLINE"],
