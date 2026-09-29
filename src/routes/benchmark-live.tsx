@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Activity, CheckCircle2, Clock3, Gauge, LockKeyhole, Play, Target, Zap } from "lucide-react";
 import { Footer, Header } from "@/components/AtlasUI";
 import { api, DEFAULT_API_BASE_URL } from "@/services/api";
@@ -45,7 +45,7 @@ function BenchmarkLive(){
   return <div className="atlas-site dashboard-site"><Header active="benchmark"/><main className="benchmark-content">
     <div className="benchmark-hero"><div><p className="eyebrow">ATLAS / PERFORMANCE VALIDATION</p><h1>Benchmark Results</h1><p>Run the benchmark against the actual tracking backend and refresh these measurements.</p></div>
       <div style={{display:"flex",alignItems:"stretch",gap:12,flexDirection:"column"}}><div className="benchmark-badge"><span className="status-dot status-dot-live"/><span>{busy?"BENCHMARK RUNNING":"BENCHMARK READY"}</span><small>{r?`${r.video.frames} FRAMES · ${f(r.video.fps,0)} FPS · ${f(r.video.duration_seconds,1)} S`:"READY FOR TEST RUN"}</small></div>
-      <button type="button" onClick={()=>void run()} disabled={busy||loading} style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,padding:"12px 16px",border:"1px solid var(--primary)",background:"var(--accent)",color:"var(--primary)",font:"11px var(--font-mono)",cursor:busy||loading?"wait":"pointer",opacity:(busy||loading)?0.55:1}}><Play size={15} fill="currentColor"/>{busy?"RUNNING...":"RUN BENCHMARK"}</button></div>
+      <div style={{display:"flex",gap:8}}><Link to="/video-benchmark" style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,padding:"12px 16px",border:"1px solid rgba(125,232,255,.35)",background:"rgba(125,232,255,.06)",color:"#a9efff",font:"11px var(--font-mono)",textDecoration:"none"}}>TEST MP4</Link><button type="button" onClick={()=>void run()} disabled={busy||loading} style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,padding:"12px 16px",border:"1px solid var(--primary)",background:"var(--accent)",color:"var(--primary)",font:"11px var(--font-mono)",cursor:busy||loading?"wait":"pointer",opacity:(busy||loading)?0.55:1}}><Play size={15} fill="currentColor"/>{busy?"RUNNING...":"RUN BENCHMARK"}</button></div></div>
     </div>
     {error&&<div style={{margin:"24px 0",padding:"15px 18px",border:"1px solid var(--destructive)",background:"var(--card)",color:"var(--foreground)",display:"flex",flexDirection:"column",gap:5}}><strong>Benchmark unavailable</strong><span style={{color:"var(--muted-foreground)",fontSize:12}}>{error}</span><small style={{fontFamily:"var(--font-mono)",color:"var(--muted-foreground)"}}>Backend: {DEFAULT_API_BASE_URL}</small></div>}
     {loading&&<div className="benchmark-loading" style={{padding:"30px 0",color:"var(--muted-foreground)",fontFamily:"var(--font-mono)",fontSize:11}}>LOADING LAST BENCHMARK...</div>}
