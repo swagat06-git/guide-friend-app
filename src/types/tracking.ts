@@ -81,3 +81,38 @@ export interface VideoBenchmarkResponse {
   };
   notes: string[];
 }
+
+export interface ScenarioBenchmarkResponse {
+  status: "completed";
+  generated_at: number;
+  scenario: {
+    motion: string;
+    atmosphere: string;
+    noise_type: string;
+    noise_level: number;
+    frames: number;
+    duration_seconds: number;
+    input_fps: number;
+  };
+  benchmark: {
+    benchmark_runtime_seconds: number;
+    measured_processing_fps: number;
+    average_processing_ms: number;
+    max_processing_ms: number;
+  };
+  tracking: {
+    detected_frames: number;
+    tracking_frames: number;
+    detection_rate_percent: number;
+    lock_retention_percent: number;
+    target_loss_percent: number;
+    first_detection_frame: number | null;
+    acquisition_time_seconds: number | null;
+  };
+  accuracy: {
+    frames_with_error: number;
+    average_centroid_error_pixels: number | null;
+    maximum_centroid_error_pixels: number | null;
+    rmse_pixels: number | null;
+  };
+}
