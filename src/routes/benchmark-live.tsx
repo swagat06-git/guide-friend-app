@@ -135,6 +135,12 @@ function BenchmarkLive(){
           <div className="benchmark-card"><div className="benchmark-card-top"><span>TARGET Y</span></div><div className="benchmark-value">{f(telemetry?.target?.y,1)}<small>PX</small></div></div>
           <div className="benchmark-card"><div className="benchmark-card-top"><span>CENTER OFFSET</span></div><div className="benchmark-value">{telemetry?.target?.x!=null&&telemetry?.target?.y!=null?f(Math.hypot(telemetry.target.x-320,telemetry.target.y-240),1):"—"}<small>PX</small></div></div>
         </div>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(4,minmax(0,1fr))",gap:10,marginTop:10}}>
+          <div className="benchmark-card"><div className="benchmark-card-top"><span>CONFIDENCE</span></div><div className="benchmark-value">{f(telemetry?.metadata?.confidence,3)}</div></div>
+          <div className="benchmark-card"><div className="benchmark-card-top"><span>VELOCITY X</span></div><div className="benchmark-value">{f(telemetry?.velocity?.x,1)}<small>PX/S</small></div></div>
+          <div className="benchmark-card"><div className="benchmark-card-top"><span>PAN COMMAND</span></div><div className="benchmark-value">{f(telemetry?.camera?.pan_speed,2)}<small>°/S</small></div></div>
+          <div className="benchmark-card"><div className="benchmark-card-top"><span>TILT COMMAND</span></div><div className="benchmark-value">{f(telemetry?.camera?.tilt_speed,2)}<small>°/S</small></div></div>
+        </div>
       </div>
       <div style={{padding:"18px",border:"1px solid var(--border)",background:"var(--card)"}}>
         <div className="section-caption"><span>OFFSET TRACE</span><span>LAST 40 SAMPLES</span></div>
