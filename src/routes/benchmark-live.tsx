@@ -18,7 +18,7 @@ const f=(v:number|null|undefined,d=2)=>v==null?"—":v.toFixed(d);
 
 const VERIFIED_SNAPSHOT: BenchmarkResponse = {
   status: "completed",
-  generated_at: 177?0,
+  generated_at: 0,
   result: {
     video: {
       path: "videos/atlas_synthetic_30s.mp4",
