@@ -80,14 +80,20 @@ function BenchmarkLive(){
 
   useEffect(()=>{
     api.getBenchmark()
-      .then(result=>{ setData(result); setBenchmarkSource("LIVE BACKEND"); })
-      .catch(e=>{
+      .then(result=>{ setData(result); setBenchmarkSource("LIVE BACKEND"); setError(""); })
+      .catch(()=>{
         setData(VERIFIED_SNAPSHOT);
         setBenchmarkSource("VERIFIED SNAPSHOT");
-        setError("Live benchmark API unavailable. Showing the last verified benchmark snapshot.");
       })
       .finally(()=>setLoading(false));
   },[]);
+
+  useEffect(()=>{
+    if(systemOnline!==true)return;
+    api.getBenchmark()
+      .then(result=>{ setData(result); setBenchmarkSource("LIVE BACKEND"); setError(""); })
+      .catch(()=>{});
+  },[systemOnline]);
 
   useEffect(()=>{
     let active=true;
