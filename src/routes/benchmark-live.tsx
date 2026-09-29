@@ -207,7 +207,7 @@ function BenchmarkLive(){
           </select>
         </label>
         <label style={{display:"grid",gap:7,font:"10px var(--font-mono)"}}>NOISE
-          <select value={scenarioNoise} onChange={e=>{setScenarioNoise(e.target.value);if(e.target.value==="none")setScenarioNoiseLevel(0);}} style={{padding:"11px",background:"var(--background)",color:"var(--foreground)",border:"1px solid var(--border)",font:"11px var(--font-mono)"}}>
+          <select value={scenarioNoise} onChange={e=>{const value=e.target.value;setScenarioNoise(value);if(value==="none")setScenarioNoiseLevel(0);else if(scenarioNoiseLevel===0)setScenarioNoiseLevel(10);}} style={{padding:"11px",background:"var(--background)",color:"var(--foreground)",border:"1px solid var(--border)",font:"11px var(--font-mono)"}}>
             <option value="none">NONE</option><option value="gaussian">GAUSSIAN</option><option value="salt_pepper">SALT & PEPPER</option><option value="poisson">POISSON</option>
           </select>
         </label>
