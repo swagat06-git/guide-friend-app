@@ -1,4 +1,4 @@
-Absolutely. Here is a clean, professional `README.md` for your ATLAS project. No emojis.
+
 
 ````markdown
 # ATLAS
