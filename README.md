@@ -469,9 +469,3 @@ API Documentation:
 GitHub Repository:
 
 [https://github.com/swagat06-git/tracking-system](https://github.com/swagat06-git/tracking-system)
-
-```
-
-You can save that directly as **`README.md`** in your `tracking-system` repository and push it with your `feature/day2-interface` branch.
-```
-
